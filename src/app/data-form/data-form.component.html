@@ -1,0 +1,51 @@
+<div>
+  <button mat-flat-button color="primary" (click)="this.toggleIsConnected()">Toggle Connected</button>
+
+  <form [formGroup]="this.fg">
+    <mat-form-field>
+      <mat-label>Firstname</mat-label>
+      <input type="text" matInput formControlName="firstName">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Lastname</mat-label>
+      <input type="text" formControlName="lastName" matInput>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Address</mat-label>
+      <textarea cols="30" rows="10" formControlName="address" matInput></textarea>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Email</mat-label>
+      <input type="text" formControlName="email" matInput />
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Age</mat-label>
+      <input type="number" formControlName="age" matInput>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>State</mat-label>
+      <mat-select formControlName="state">
+        <mat-option *ngFor="let state of this.states" [value]="state"
+          (onSelectionChange)="this.getCitiesByState($event, state)">
+          {{ state.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>City</mat-label>
+      <mat-select formControlName="city">
+        <mat-option *ngFor="let city of this.cities" [value]="city">
+          {{ city.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+
+  <button mat-button color="primary" type="button" (click)="this.downloadStateData()">Download State Data</button>
+</div>
