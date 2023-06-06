@@ -3,6 +3,11 @@
 
   <form [formGroup]="this.fg">
     <mat-form-field>
+      <mat-label>Application ID</mat-label>
+      <input type="text" matInput formControlName="applicationId" readonly="true" />
+    </mat-form-field>
+
+    <mat-form-field>
       <mat-label>Firstname</mat-label>
       <input type="text" matInput formControlName="firstName">
     </mat-form-field>
@@ -47,5 +52,9 @@
     </mat-form-field>
   </form>
 
-  <button mat-button color="primary" type="button" (click)="this.downloadStateData()">Download State Data</button>
+  <button [disabled]="!this.dataService.isConnected" mat-flat-button
+    [color]="this.dataService.isConnected ? 'primary' : 'warn'" type="button"
+    (click)="this.downloadStateData()">Download State Data</button>
+
+  <button type="button" mat-flat-button color="primary" (click)="this.submitUserDetails()">Submit</button>
 </div>

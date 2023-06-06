@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { City, State } from '../CreateDatabase';
 import { DataService } from '../data.service';
+import { debug } from '../rxdb.service';
+import { State } from '../Types/State';
+import { City } from '../Types/City';
 
 @Component({
   selector: 'app-data-form',
@@ -10,6 +12,8 @@ import { DataService } from '../data.service';
 })
 export class DataFormComponent implements OnInit {
   fg: FormGroup;
+
+  className = "DataFormComponent";
 
   isConnected = true;
 
@@ -20,6 +24,7 @@ export class DataFormComponent implements OnInit {
 
   public constructor(fb: FormBuilder, protected dataService: DataService) {
     this.fg = fb.group({
+      applicationId: fb.control(''),
       firstName: fb.control('', [Validators.required]),
       lastName: fb.control('', [Validators.required]),
       address: fb.control('', [Validators.required]),
@@ -31,23 +36,33 @@ export class DataFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataService.getStates().subscribe(res => {
-      console.log("Got states", res);
+    let functionName = "ngOnInit()";
+    debug(`${this.className}::${functionName}`);
+
+    // Subscribe to the states and cities objservable
+    this.dataService.states$.subscribe(res => {
+      debug(`${this.className}::${functionName} got states`, res);
 
       this.states = res;
     });
 
-    this.dataService.isConnected$.subscribe(res => {
+    this.dataService.cities$.subscribe(res => {
+      debug(`${this.className}::${functionName} got cities`, res);
 
-      this.dataService.getStates().subscribe(res => {
-        this.states = res;
-      });
+      this.cities = res;
+    });
 
-    })
+    // Manually get the states the first time
+    this.dataService.getStates()
+
   }
 
   getCitiesByState(e: any, state: State) {
+
     if (e.isUserInput) {
+      let functionName = "getCitiesByState()";
+      debug(`${this.className}::${functionName}`, state);
+
       console.log("Got", state);
 
       this.currentSelectedState = state;
@@ -61,7 +76,9 @@ export class DataFormComponent implements OnInit {
   }
 
   downloadStateData() {
-    console.log("Downloading state data", this.currentSelectedState?.id);
+    let functionName = "downloadStateData()";
+    debug(`${this.className}::${functionName}`, this.currentSelectedState);
+
 
     if (this.currentSelectedState) {
       this.dataService.getCitiesByState(this.currentSelectedState).subscribe(res => {
@@ -76,5 +93,15 @@ export class DataFormComponent implements OnInit {
 
   toggleIsConnected() {
     this.dataService.toggleIsConnected();
+  }
+
+  submitUserDetails() {
+    let functionName = 'submitUserDetails()';
+
+    debug(`${this.className}::${functionName}`, this.fg.errors, this.fg.valid);
+    if (this.fg.valid) {
+      debug(`${this.className}::${functionName}`, this.fg.value);
+
+    }
   }
 }

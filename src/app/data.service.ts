@@ -8,20 +8,26 @@ import { Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class DataService {
-  protected isConnectedSubject = new Subject<boolean>();
-  public isConnected$ = this.isConnectedSubject.asObservable();
-
   public isConnected = true;
+
+  protected statesSubject = new Subject<State[]>();
+  public states$ = this.statesSubject.asObservable();
+
+  protected citiesSubject = new Subject<City[]>();
+  public cities$ = this.citiesSubject.asObservable();
 
   constructor(
     protected apiService: ApiService,
     protected rxdbService: RxdbService,
-  ) { }
+  ) {
+  }
 
   getStates() {
-    if (this.isConnected)
-      return this.apiService.getStates();
-    return this.rxdbService.getStates();
+    let resultObservable = this.isConnected ? this.apiService.getStates() : this.rxdbService.getStates();
+
+    resultObservable.subscribe(res => {
+      this.statesSubject.next(res);
+    })
   }
 
   getCitiesByState(state: State) {
@@ -38,10 +44,15 @@ export class DataService {
 
   toggleIsConnected() {
     this.isConnected = !this.isConnected;
-    if (!this.isConnected) {
+
+    // If we're in connected mode, clear the previous data from
+    // rxdb
+    if (this.isConnected) {
       this.rxdbService.clearCities();
       this.rxdbService.clearStates();
     }
-    this.isConnectedSubject.next(this.isConnected);
+
+    // Get the states
+    this.getStates();
   }
 }

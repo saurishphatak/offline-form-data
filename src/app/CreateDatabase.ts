@@ -6,6 +6,9 @@ import {
   RxDocument,
   RxJsonSchema
 } from 'rxdb';
+import { State } from './Types/State';
+import { City } from './Types/City';
+
 
 const stateSchemaLiteral = {
   title: 'states',
@@ -23,10 +26,7 @@ const stateSchemaLiteral = {
   }
 } as const;
 
-export type State = {
-  id: string;
-  name: string;
-};
+
 
 export const stateSchema: RxJsonSchema<State> = stateSchemaLiteral;
 
@@ -49,11 +49,7 @@ const citySchemaLiteral = {
   }
 } as const;
 
-export type City = {
-  id: string;
-  name: string;
-  stateId: string;
-};
+
 
 
 export const citySchema: RxJsonSchema<City> = citySchemaLiteral;
@@ -67,3 +63,5 @@ export type OfflineDataCollections = {
 }
 
 export type OfflineDatabase = RxDatabase<OfflineDataCollections>;
+export { State, City };
+
