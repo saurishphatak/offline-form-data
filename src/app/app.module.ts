@@ -11,10 +11,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSelectModule } from "@angular/material/select";
 import { HttpClientModule } from "@angular/common/http";
 import { MatButtonModule } from "@angular/material/button";
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { MatRadioModule } from "@angular/material/radio";
 @NgModule({
   declarations: [
     AppComponent,
-    DataFormComponent
+    DataFormComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -26,7 +29,8 @@ import { MatButtonModule } from "@angular/material/button";
     MatFormFieldModule,
     MatSelectModule,
     HttpClientModule,
-    MatButtonModule
+    MatButtonModule,
+    MatRadioModule
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } }

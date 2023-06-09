@@ -1,5 +1,8 @@
+<button type="button" mat-raised-button color="accent" routerLink="/dashboard">Dashboard</button>
+
 <div>
-  <button mat-flat-button color="primary" (click)="this.toggleIsConnected()">Toggle Connected</button>
+  <button mat-flat-button [color]="this.dataService.isConnected ? 'primary' : 'warn'"
+    (click)="this.toggleIsConnected()">{{ this.dataService.isConnected ? 'Connected' : 'Disconnected' }}</button>
 
   <form [formGroup]="this.fg">
     <mat-form-field>
@@ -33,6 +36,11 @@
     </mat-form-field>
 
     <mat-form-field>
+      <mat-label>Gender</mat-label>
+      <input type="text" formControlName="gender" matInput>
+    </mat-form-field>
+
+    <mat-form-field>
       <mat-label>State</mat-label>
       <mat-select formControlName="state">
         <mat-option *ngFor="let state of this.states" [value]="state"
@@ -52,8 +60,7 @@
     </mat-form-field>
   </form>
 
-  <button [disabled]="!this.dataService.isConnected" mat-flat-button
-    [color]="this.dataService.isConnected ? 'primary' : 'warn'" type="button"
+  <button [disabled]="!this.dataService.isConnected" mat-flat-button [color]="'primary'" type="button"
     (click)="this.downloadStateData()">Download State Data</button>
 
   <button type="button" mat-flat-button color="primary" (click)="this.submitUserDetails()">Submit</button>

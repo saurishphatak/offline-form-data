@@ -1,0 +1,36 @@
+<button type="button" mat-raised-button color="accent" routerLink="/applicationForm">Application Form</button>
+
+<div>
+  <div class="user-details-card" *ngFor="let user of this.userDetails">
+    <div>
+      <span>Application ID : </span>
+      <span>{{user.applicationId}}</span>
+    </div>
+
+    <div>
+      <span>First Name : </span>
+      <span>{{user.firstName}}</span>
+    </div>
+
+    <div>
+      <span>Last Name : </span>
+      <span>{{user.lastName}}</span>
+    </div>
+
+    <div>
+      <span>State : </span>
+      <span>{{user.state.name}}</span>
+    </div>
+
+    <div>
+      <span>City : </span>
+      <span>{{user.city.name}}</span>
+    </div>
+
+    <div>
+      <span>Status : </span>
+      <span>{{user.status}}</span>
+    </div>
+  </div>
+
+</div>

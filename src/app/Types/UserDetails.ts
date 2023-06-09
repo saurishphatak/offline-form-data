@@ -11,4 +11,6 @@ export type UserDetails = {
   gender: string;
   state: State;
   city: City;
+  status: string;
+  age: number;
 }

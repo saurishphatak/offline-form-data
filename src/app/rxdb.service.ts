@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { IDataService } from './Interfaces/IDataService';
-import { City, OfflineDatabase, State, citySchema, stateSchema } from './CreateDatabase';
+import { City, OfflineDatabase, State, citySchema, stateSchema, userDetailsSchema } from './CreateDatabase';
 import { createRxDatabase } from 'rxdb';
 import { } from "rxdb/plugins/dev-mode";
 import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
-import { Subject } from 'rxjs';
+import { Subject, share, shareReplay, take } from 'rxjs';
 import { addRxPlugin } from 'rxdb';
 import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
+import { UserDetails } from './Types/UserDetails';
 
 export const debug = console.log;
 
@@ -24,6 +25,9 @@ export class RxdbService {
 
   citiesSubject = new Subject<City[]>();
   cities$ = this.citiesSubject.asObservable();
+
+  userDetailsSubject = new Subject<UserDetails[]>();
+  userDetails$ = this.userDetailsSubject.asObservable();
 
   constructor() {
     let functionName = "constructor()";
@@ -52,18 +56,19 @@ export class RxdbService {
       },
       cities: {
         schema: citySchema
+      },
+      userDetails: {
+        schema: userDetailsSchema
       }
     });
 
     // Add plugins to the database
-    addRxPlugin(RxDBDevModePlugin);
+    // addRxPlugin(RxDBDevModePlugin);
   }
 
   getStates() {
     let functionName = 'getStates()';
     debug(`${this.className}::${functionName}`);
-
-    debug(`${this.className}::${functionName}`, this.db.states);
 
     this.db.states.find().exec().then(res => {
       let statesArray: State[] = res.map(st => ({
@@ -74,7 +79,7 @@ export class RxdbService {
       this.statesSubject.next(statesArray);
     });
 
-    return this.states$;
+    return this.states$.pipe(take(1));
   }
 
   getCitiesByState(state: State) {
@@ -95,11 +100,25 @@ export class RxdbService {
       this.citiesSubject.next(citiesArray);
     });
 
-    return this.cities$;
+    return this.cities$.pipe(take(1));
   }
 
-  submitFormData(formData: any) {
-    throw new Error('Method not implemented.');
+  submitUserDetails(userDetails: UserDetails) {
+    let functionName = 'submitFormData()';
+
+    debug(`${this.className}::${functionName}`, userDetails);
+
+    // Temporarily create a user application id and
+    // store it
+    userDetails.applicationId = new Date().getTime().toString();
+
+    this.db.userDetails.upsert(userDetails).then(res => {
+      debug(`${this.className}::${functionName} added userDetails`);
+
+      this.userDetailsSubject.next([userDetails]);
+    });
+
+    return this.userDetails$.pipe(take(1));
   }
 
   async addState(state: State) {
@@ -135,6 +154,40 @@ export class RxdbService {
 
     for (const state of await this.db.states.find().exec()) {
       await state.remove();
+    }
+  }
+
+  public getAllUserDetails() {
+    let functionName = "getAllUserDetails()";
+    debug(`${this.className}::${functionName}`);
+
+    this.db.userDetails.find().exec().then(res => {
+      let userDetailsArray: UserDetails[] = res.map(u => ({
+        address: u.address,
+        applicationId: u.applicationId,
+        lastName: u.lastName,
+        firstName: u.firstName,
+        city: u.city,
+        email: u.email,
+        gender: u.gender,
+        phoneNumber: u.phoneNumber,
+        state: u.state,
+        status: u.status,
+        age: u.age
+      }));
+
+      this.userDetailsSubject.next(userDetailsArray);
+    });
+
+    return this.userDetails$.pipe(take(1));
+  }
+
+  async clearUserDetails() {
+    let functionName = "clearUserDetails()";
+    debug(`${this.className}::${functionName}`);
+
+    for (const user of await this.db.userDetails.find().exec()) {
+      await user.remove();
     }
   }
 }
